@@ -1,0 +1,12 @@
+"*.parquet" 
+"*.csv" 
+"__pycache__/" 
+".ipynb_checkpoints/" 
+".DS_Store" 
+"*.parquet" 
+"*.csv" 
+"__pycache__/" 
+".ipynb_checkpoints/" 
+".DS_Store" 
+*.parquet 
+*.csv 
