@@ -7,7 +7,7 @@ A high-performance quantitative backtesting and execution engine designed to iso
 
 \## System Architecture \& Dual-Gate Design
 
-##  Core Architecture & Cross-Market Optimization
+##  Core Architecture & Cross-Market Optimisation
 
 To ensure seamless execution across global exchanges (e.g., SPY, Euro Stoxx, HKEX) without localisation friction, the pipeline uses a **100% Timezone-Naive Datetime Core**. 
 
