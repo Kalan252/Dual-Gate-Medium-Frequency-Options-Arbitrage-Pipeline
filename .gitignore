@@ -10,3 +10,5 @@
 ".DS_Store" 
 *.parquet 
 *.csv 
+HFT_project.ipynb
+HFT_project-V2.ipynb
