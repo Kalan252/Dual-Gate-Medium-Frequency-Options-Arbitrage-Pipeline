@@ -1,8 +1,8 @@
-\# High-Frequency Options Arbitrage Pipeline with Roll Microstructure \& Intraday HAR-RV Forecasting
+\# Medium-Frequency Options Arbitrage Pipeline with Roll Microstructure \& Intraday HAR-RV Forecasting
 
 
 
-A high-performance quantitative backtesting and execution engine designed to isolate intraday options pricing anomalies on SPY. The framework minimises computational overhead by using a dual-gate architecture that dynamically filters the options space using underlying asset microstructure boundaries before running a Numba-JIT accelerated Implicit Finite Difference Method (FDM) pricing kernel.
+A high-performance quantitative backtesting and execution engine designed to isolate intraday options pricing anomalies on SPY. The framework minimises computational overhead by using a dual-gate architecture that dynamically filters the options space using underlying asset microstructure boundaries before running a Numba-JIT accelerated Crank-Nicolson Finite Difference Method (FDM) pricing kernel.
 
 
 \## System Architecture \& Dual-Gate Design
@@ -14,7 +14,7 @@ To ensure seamless execution across global exchanges (e.g., SPY, Euro Stoxx, HKE
 All incoming tick data feeds pass through an accelerated timestamp normaliser that strips local timezone offsets (`America/New_York`, `UTC`, etc.) at the root ingestion layer. This design choice eliminates timezone-comparison runtime errors (`TypeError`) during walk-forward boundary slicing, drops computational overhead, and allows identical forecasting logic to deploy globally out of the box.
 
 
-To process massive high-frequency options data without experiencing kernel memory exhaustion, the pipeline implements a strict "Filter Before Price" engineering constraint.
+To process massive medium-frequency options data without experiencing kernel memory exhaustion, the pipeline implements a strict "Filter Before Price" engineering constraint.
 
 
 \### Gate 1: Macro Stock Structure Boundary (Microstructure Bollinger Bands)
@@ -39,7 +39,7 @@ During the validation testing sequence, a major regime shift occurred on **May 1
 
 * **Model Responsiveness:** Due to the structural lookback dependencies inherent to the cascade components, the HAR-RV forecast remained flat at **11.2%** during the intraday shock window. However, upon cross-validation fold re-baselining for the final session (May 15), the model instantly ingested the shock, stepping its annualised forecast up to **~21.5%**.
 
-* **Defensive System Asymmetry:** This tracking lag serves as a built-in risk mitigation mechanism. When market implied volatility expands violently past the HAR-RV forecast, the Implicit Finite Difference Method (FDM) kernel generates highly conservative theoretical values. This prevents the High-Frequency Scanner from executing long positions on overpriced options premiums during sudden market dislocations.
+* **Defensive System Asymmetry:** This tracking lag serves as a built-in risk mitigation mechanism. When market implied volatility expands violently past the HAR-RV forecast, the Crank-Nicolson Finite Difference Method (FDM) kernel generates highly conservative theoretical values. This prevents the medium-Frequency Scanner from executing long positions on overpriced options premiums during sudden market dislocations.
 
 \###  Automated Visual Verification Panel
 
@@ -64,7 +64,7 @@ The framework incorporates an Intraday HAR-RV (Heterogeneous Autoregressive mode
 
 ###  V2 Optimisation: Cold-Start Structural Gate Safeguard
 
-In high-frequency volatility scanning, raw data processing at market open introduces transient anomalies due to unpopulated rolling windows. In V1, the rolling microstructure window lacked historical context during the initial morning ticks, causing the upper and lower Bollinger Bands to collapse onto a single identity line (BB_{upper} == BB_{lower}). This artificial compression triggered massive systemic false-positives, classifying standard market ticks as structural anomalies and bottlenecking the downstream finite difference method (FDM) pricing matrix.
+In medium-frequency volatility scanning, raw data processing at market open introduces transient anomalies due to unpopulated rolling windows. In V1, the rolling microstructure window lacked historical context during the initial morning ticks, causing the upper and lower Bollinger Bands to collapse onto a single identity line (BB_{upper} == BB_{lower}). This artificial compression triggered massive systemic false-positives, classifying standard market ticks as structural anomalies and bottlenecking the downstream finite difference method (FDM) pricing matrix.
 
 **V2 Multi-Gate Hardening Upgrades**
 * **Asymmetric Warm-Up Mask:** Implemented a vectorised state validator (`warmed_up_mask = df_m['BB_upper'] != df_m['BB_lower']`) to isolate and discard unpopulated cold-start lookback windows.
